@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+enum Result {
+    OK = 0;
+    ERROR = 1;
+}
+
+message Error {
+    string msg = 1;
+    google.protobuf.Any details = 2;
+}
+
+message RpcRequest {
+    uint32 id = 1;
+    google.protobuf.Any payload = 2;
+}
+
+message RpcResponse {
+    Result result = 1;
+    Error error = 2;
+    google.protobuf.Any payload = 3;
+}
+

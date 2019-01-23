@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+message Person {
+    string name = 1;
+    uint32 id = 2;
+    string email = 3;
+}
+
+message Animal {
+    string name = 1;
+    string family = 2;
+}
+
