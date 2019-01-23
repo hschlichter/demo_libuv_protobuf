@@ -18,7 +18,6 @@ SERVER_OBJS = $(foreach obj, $(SERVER_SRCS:.cpp=.o), $(OUT)/$(obj))
 CLIENT_OBJS = $(foreach obj, $(CLIENT_SRCS:.cpp=.o), $(OUT)/$(obj))
 SHARED_OBJS = $(foreach obj, $(SHARED_SRCS:.cpp=.o), $(OUT)/$(obj))
 
-# Protobuffer build rules
 PROTO_OBJS = $(foreach obj, $(PROTO_SRCS:.cc=.o), $(OUT)/$(obj))
 PROTO_SRCS = $(foreach obj, $(PROTO_FILES:.proto=.pb.cc), $(GENERATED)/$(obj))\
  
@@ -26,13 +25,14 @@ PROTO_SRCS = $(foreach obj, $(PROTO_FILES:.proto=.pb.cc), $(GENERATED)/$(obj))\
 .PHONY: all
 all: server client
 
+# Protobuffer build rules
 $(PROTO_SRCS): $(GENERATED)/%.pb.cc: %.proto
-	@./external/protobuf-3.6.1/bin/protoc -I. --cpp_out=$(GENERATED) $<
 	@ echo [PROTOC] $<
+	@./external/protobuf-3.6.1/bin/protoc -I. --cpp_out=$(GENERATED) $<
 
 $(PROTO_OBJS): $(OUT)/%.o: %.cc
-	@$(CC) -c $(CFLAGS) -o $@ $< $(INCLUDE)
 	@echo [CC] $<
+	@$(CC) -c $(CFLAGS) -o $@ $< $(INCLUDE)
 
 -include $(PROTO_OBJS:%.o=%.d)
 
