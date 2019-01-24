@@ -20,45 +20,53 @@ SHARED_OBJS = $(foreach obj, $(SHARED_SRCS:.cpp=.o), $(OUT)/$(obj))
 
 PROTO_OBJS = $(foreach obj, $(PROTO_SRCS:.cc=.o), $(OUT)/$(obj))
 PROTO_SRCS = $(foreach obj, $(PROTO_FILES:.proto=.pb.cc), $(GENERATED)/$(obj))\
- 
+
+define cc
+@echo [CC] $<
+@$(CC) -c $(CFLAGS) -o $@ $< $(INCLUDE)
+endef
+
+define link
+@echo [LINK] $@
+@$(CC) $^ -o $(OUT)/$@ -Wl,-rpath,. $(CFLAGS) $(INCLUDE) $(LDINCLUDE) $(LDFLAGS)
+endef
+
+define protoc
+@echo [PROTOC] $<
+@./external/protobuf-3.6.1/bin/protoc -I. --cpp_out=$(GENERATED) $<
+endef
+
 # Main build rules.
 .PHONY: all
 all: server client
 
 # Protobuffer build rules
 $(PROTO_SRCS): $(GENERATED)/%.pb.cc: %.proto
-	@ echo [PROTOC] $<
-	@./external/protobuf-3.6.1/bin/protoc -I. --cpp_out=$(GENERATED) $<
+	$(protoc)
 
 $(PROTO_OBJS): $(OUT)/%.o: %.cc
-	@echo [CC] $<
-	@$(CC) -c $(CFLAGS) -o $@ $< $(INCLUDE)
+	$(cc)
 
 -include $(PROTO_OBJS:%.o=%.d)
 
 client: $(PROTO_OBJS) $(CLIENT_OBJS) $(SHARED_OBJS) 
-	@echo [LINK] $@
-	@$(CC) $^ -o $(OUT)/$@ -Wl,-rpath,. $(CFLAGS) $(INCLUDE) $(LDINCLUDE) $(LDFLAGS)
+	$(link)
 
 server: $(PROTO_OBJS) $(SERVER_OBJS) $(SHARED_OBJS) 
-	@echo [LINK] $@
-	@$(CC) $^ -o $(OUT)/$@ -Wl,-rpath,. $(CFLAGS) $(INCLUDE) $(LDINCLUDE) $(LDFLAGS)
+	$(link)
 
 $(SERVER_OBJS): $(OUT)/%.o: %.cpp
-	@echo [CC] $<
-	@$(CC) -c $(CFLAGS) -o $@ $< $(INCLUDE)
+	$(cc)
 
 -include $(SERVER_OBJS:%.o=%.d)
 
 $(CLIENT_OBJS): $(OUT)/%.o: %.cpp
-	@echo [CC] $<
-	@$(CC) -c $(CFLAGS) -o $@ $< $(INCLUDE)
+	$(cc)
 
 -include $(CLIENT_OBJS:%.o=%.d)
 
 $(SHARED_OBJS): $(OUT)/%.o: %.cpp
-	@echo [CC] $<
-	@$(CC) -c $(CFLAGS) -o $@ $< $(INCLUDE)
+	$(cc)
 
 -include $(SHARED_OBJS:%.o=%.d)
 

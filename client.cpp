@@ -6,6 +6,8 @@
 #include "generated/rpc.pb.h"
 #include "generated/hello.pb.h"
 
+#include "common.h"
+
 unsigned int sequenceId = 0;
 
 int main(int argc, char* argv[])

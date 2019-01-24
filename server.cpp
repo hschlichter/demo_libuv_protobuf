@@ -5,6 +5,8 @@
 #include "generated/rpc.pb.h"
 #include "generated/hello.pb.h"
 
+#include "common.h"
+
 #define PORT 8000
 
 uv_loop_t* loop;
