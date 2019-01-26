@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
         // void* data = malloc(size);
         // bool success = person.SerializePartialToArray(data, size);
 
-        fubar_data_t fb = create_fixed_fubar_data();
+        fubar_data_t fb = fubar_data_create_fixed();
         FubarWithData fubar;
         fubar.set_id(1337);
         fubar.set_data(&fb, sizeof(fb));

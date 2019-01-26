@@ -14,6 +14,7 @@ typedef struct fubar_data_s {
     bool world;
 } fubar_data_t;
 
-fubar_data_t create_fixed_fubar_data();
+fubar_data_t fubar_data_create_fixed();
+void fubar_data_print(const fubar_data_t& fb);
 void hello_world();
 

@@ -68,14 +68,7 @@ int main(int argc, char* argv[])
 
                             fubar_data_t fb;
                             memcpy(&fb, data.c_str(), sizeof(fb));
-
-                            printf("fb.has_data = %d\n", fb.has_data);
-                            printf("fb.name = %s\n", fb.name);
-                            printf("fb.counter = %d\n", fb.counter);
-                            printf("fb.second_counter = %d\n", fb.second_counter);
-                            printf("fb.hello.number = %d\n", fb.hello.number);
-                            printf("fb.hello.message = %s\n", fb.hello.message);
-                            printf("fb.name = %d\n", fb.world);
+                            fubar_data_print(fb);
                         }
                         else
                         {
