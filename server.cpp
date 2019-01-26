@@ -53,11 +53,32 @@ int main(int argc, char* argv[])
                         RpcRequest request;
                         request.ParseFromArray(buf->base, buf->len);
 
-                        if (request.payload().Is<Person>()) {
+                        if (request.payload().Is<Person>())
+                        {
                             Person person;
                             request.payload().UnpackTo(&person);
                             printf("%s\n", person.DebugString().c_str());
-                        } else {
+                        }
+                        else if (request.payload().Is<FubarWithData>())
+                        {
+                            FubarWithData fubar;
+                            request.payload().UnpackTo(&fubar);
+
+                            std::string data = fubar.data();
+
+                            fubar_data_t fb;
+                            memcpy(&fb, data.c_str(), sizeof(fb));
+
+                            printf("fb.has_data = %d\n", fb.has_data);
+                            printf("fb.name = %s\n", fb.name);
+                            printf("fb.counter = %d\n", fb.counter);
+                            printf("fb.second_counter = %d\n", fb.second_counter);
+                            printf("fb.hello.number = %d\n", fb.hello.number);
+                            printf("fb.hello.message = %s\n", fb.hello.message);
+                            printf("fb.name = %d\n", fb.world);
+                        }
+                        else
+                        {
                             printf("Don't know the payload\n");
                             printf("%s\n", request.DebugString().c_str());
                         }

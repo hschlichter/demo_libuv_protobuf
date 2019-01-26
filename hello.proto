@@ -11,3 +11,8 @@ message Animal {
     string family = 2;
 }
 
+message FubarWithData {
+    uint32 id = 1;
+    bytes data = 2;
+}
+

@@ -30,19 +30,25 @@ int main(int argc, char* argv[])
         /* person.set_id(1337); */
         /* person.set_email("emma@icloud.com"); */
 
-        Animal animal;
-        animal.set_name("Lion");
-        animal.set_family("Cat");
+        /* Animal animal; */
+        /* animal.set_name("Lion"); */
+        /* animal.set_family("Cat"); */
 
         // size_t size = person.ByteSizeLong();
         // void* data = malloc(size);
         // bool success = person.SerializePartialToArray(data, size);
 
+        fubar_data_t fb = create_fixed_fubar_data();
+        FubarWithData fubar;
+        fubar.set_id(1337);
+        fubar.set_data(&fb, sizeof(fb));
+
         RpcRequest request;
         request.set_id(sequenceId++);
         auto payload = request.mutable_payload();
         // payload->PackFrom(person);
-        payload->PackFrom(animal);
+        // payload->PackFrom(animal);
+        payload->PackFrom(fubar);
 
         size_t size = request.ByteSizeLong();
         void* data = malloc(size);
