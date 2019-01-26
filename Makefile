@@ -14,12 +14,16 @@ SERVER_SRCS = server.cpp
 CLIENT_SRCS = client.cpp
 SHARED_SRCS = common.cpp
 
+COPY_FILES = ./external/libuv/libuv.dylib
+
 SERVER_OBJS = $(foreach obj, $(SERVER_SRCS:.cpp=.o), $(OUT)/$(obj))
 CLIENT_OBJS = $(foreach obj, $(CLIENT_SRCS:.cpp=.o), $(OUT)/$(obj))
 SHARED_OBJS = $(foreach obj, $(SHARED_SRCS:.cpp=.o), $(OUT)/$(obj))
 
 PROTO_OBJS = $(foreach obj, $(PROTO_SRCS:.cc=.o), $(OUT)/$(obj))
 PROTO_SRCS = $(foreach obj, $(PROTO_FILES:.proto=.pb.cc), $(GENERATED)/$(obj))\
+
+COPY_DST = $(foreach f, $(COPY_FILES), $(OUT)/$(notdir $(f)))
 
 define cc
 @echo [CC] $<
@@ -31,28 +35,27 @@ define link
 @$(CC) $^ -o $(OUT)/$@ -Wl,-rpath,. $(CFLAGS) $(INCLUDE) $(LDINCLUDE) $(LDFLAGS)
 endef
 
-define protoc
-@echo [PROTOC] $<
-@./external/protobuf-3.6.1/bin/protoc -I. --cpp_out=$(GENERATED) $<
-endef
-
 # Main build rules.
 .PHONY: all
 all: server client
 
-# Protobuffer build rules
+$(COPY_DST): $(COPY_FILES)
+	@cp -f $< $@
+	@echo [COPY] $<
+
 $(PROTO_SRCS): $(GENERATED)/%.pb.cc: %.proto
-	$(protoc)
+	@echo [PROTOC] $<
+	@./external/protobuf-3.6.1/bin/protoc -I. --cpp_out=$(GENERATED) $<
 
 $(PROTO_OBJS): $(OUT)/%.o: %.cc
 	$(cc)
 
 -include $(PROTO_OBJS:%.o=%.d)
 
-client: $(PROTO_OBJS) $(CLIENT_OBJS) $(SHARED_OBJS) 
+client: $(COPY_DST) $(PROTO_OBJS) $(CLIENT_OBJS) $(SHARED_OBJS)
 	$(link)
 
-server: $(PROTO_OBJS) $(SERVER_OBJS) $(SHARED_OBJS) 
+server: $(COPY_DST) $(PROTO_OBJS) $(SERVER_OBJS) $(SHARED_OBJS)
 	$(link)
 
 $(SERVER_OBJS): $(OUT)/%.o: %.cpp
