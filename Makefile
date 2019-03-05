@@ -25,16 +25,6 @@ PROTO_SRCS = $(foreach obj, $(PROTO_FILES:.proto=.pb.cc), $(GENERATED)/$(obj))\
 
 COPY_DST = $(foreach f, $(COPY_FILES), $(OUT)/$(notdir $(f)))
 
-define cc
-@echo [CC] $<
-@$(CC) -c $(CFLAGS) -o $@ $< $(INCLUDE)
-endef
-
-define link
-@echo [LINK] $@
-@$(CC) $^ -o $(OUT)/$@ -Wl,-rpath,. $(CFLAGS) $(INCLUDE) $(LDINCLUDE) $(LDFLAGS)
-endef
-
 # Main build rules.
 .PHONY: all
 all: server client
@@ -48,28 +38,34 @@ $(PROTO_SRCS): $(GENERATED)/%.pb.cc: %.proto
 	@./external/protobuf-3.6.1/bin/protoc -I. --cpp_out=$(GENERATED) $<
 
 $(PROTO_OBJS): $(OUT)/%.o: %.cc
-	$(cc)
+	@echo [CC] $<
+	@$(CC) -c $(CFLAGS) -o $@ $< $(INCLUDE)
 
 -include $(PROTO_OBJS:%.o=%.d)
 
 client: $(COPY_DST) $(PROTO_OBJS) $(CLIENT_OBJS) $(SHARED_OBJS)
-	$(link)
+	@echo [LINK] $@
+	@$(CC) $^ -o $(OUT)/$@ -Wl,-rpath,. $(CFLAGS) $(INCLUDE) $(LDINCLUDE) $(LDFLAGS)
 
 server: $(COPY_DST) $(PROTO_OBJS) $(SERVER_OBJS) $(SHARED_OBJS)
-	$(link)
+	@echo [LINK] $@
+	@$(CC) $^ -o $(OUT)/$@ -Wl,-rpath,. $(CFLAGS) $(INCLUDE) $(LDINCLUDE) $(LDFLAGS)
 
 $(SERVER_OBJS): $(OUT)/%.o: %.cpp
-	$(cc)
+	@echo [CC] $<
+	@$(CC) -c $(CFLAGS) -o $@ $< $(INCLUDE)
 
 -include $(SERVER_OBJS:%.o=%.d)
 
 $(CLIENT_OBJS): $(OUT)/%.o: %.cpp
-	$(cc)
+	@echo [CC] $<
+	@$(CC) -c $(CFLAGS) -o $@ $< $(INCLUDE)
 
 -include $(CLIENT_OBJS:%.o=%.d)
 
 $(SHARED_OBJS): $(OUT)/%.o: %.cpp
-	$(cc)
+	@echo [CC] $<
+	@$(CC) -c $(CFLAGS) -o $@ $< $(INCLUDE)
 
 -include $(SHARED_OBJS:%.o=%.d)
 
